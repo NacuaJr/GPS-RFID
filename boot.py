@@ -14,6 +14,10 @@ GPS_TX = 17  # GPS TX pin (connected to ESP RX2)
 GPS_RX = 16  # GPS RX pin (connected to ESP TX2)
 gps_serial = UART(2, baudrate=9600, tx=GPS_TX, rx=GPS_RX)
 
+# LED pin configuration
+LED_PIN = 2  # Use GPIO 2 for the LED
+led = Pin(LED_PIN, Pin.OUT)
+
 # Initialize SPI for RFID
 spi = SPI(2, baudrate=1000000, polarity=0, phase=0, sck=Pin(SCK_PIN), mosi=Pin(MOSI_PIN), miso=Pin(MISO_PIN))
 rfid = MFRC522(spi=spi, gpioRst=RST_PIN, gpioCs=CS_PIN)
@@ -41,6 +45,11 @@ def read_rfid():
         (status, tag_type) = rfid.request(rfid.REQIDL)
         if status == rfid.OK:
             print("Card detected")
+            # Turn on LED for 2 seconds
+            led.value(1)
+            time.sleep(2)
+            led.value(0)
+            
             # Perform anticollision to get UID
             (status, uid) = rfid.anticoll()
             if status == rfid.OK:
